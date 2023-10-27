@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsecure raw form</title>
+    <style>
+        input {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Laboration with unfiltered input</h1>
+    <!-- https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Safely_inserting_external_content_into_a_page -->
+    <p>Copy and insert for example: </p>
+    <ul>
+        <!-- htmlentitites https://www.freeformatter.com/html-entities.html -->
+        <li><code>&lt;img&#32;src&#61;&#39;x&#39;&#32;onerror&#61;&#39;alert&#40;1&#41;&#39;&gt;</code></li>
+        <li><code>&lt;script&gt;alert&#40;1&#41;&gt;&lt;&#47;script&gt;</code></li>
+    </ul>
+    <form method="post" action="/bar">
+        <label>
+            into here:
+            <input id="bad-input" name="foo-input" type="text" />
+        </label>
+        <label>add as innerHTML<input type="submit" id="innerhtml" type="button"></label>
+        <label>add as textContent<input type="submit" id="textcontent" type="button"></label>
+        <label>add as setHtml<input type="submit" id="sethtml" type="button"></label>
+    </form>
+    <p>result Bad (?):<output id="the-output"></output></p>
+    <button id="stop-timer">stop interval</button>
+    <script>
+        const badInputElm = document.querySelector('#bad-input');
+        const anything = () => { console.log('anything', badInputElm.value, typeof badInputElm.value);  }
+        const timeId = setInterval(anything,2000);
+        document.querySelector('#stop-timer').addEventListener('click', ()=> clearInterval(timeId)  )
+    </script>
+
+</body>
+<script>
+    document.querySelector('#innerhtml').addEventListener(
+        'click', event => {
+            event.preventDefault();
+            const badInputElm = document.querySelector('#bad-input');
+            const outputElm = document.querySelector('#the-output');
+            console.log('insert into element badInput:', badInputElm.value);
+            outputElm.innerHTML = badInputElm.value;
+        });
+    document.querySelector('#textcontent').addEventListener(
+        'click', event => {
+            event.preventDefault();
+            const badInputElm = document.querySelector('#bad-input');
+            const outputElm = document.querySelector('#the-output');
+            console.log('insert into element textcontent:', badInputElm.value);
+            outputElm.textContent = badInputElm.value;
+        });
+    document.querySelector('#sethtml').addEventListener(
+        'click', event => {
+            event.preventDefault();
+            const badInputElm = document.querySelector('#bad-input');
+            const outputElm = document.querySelector('#the-output');
+            console.log('insert into element sethtml:', badInputElm.value);
+            outputElm.textContent = badInputElm.value;
+            const sanitizer1 = new Sanitizer();  // Default sanitizer;
+            // Get the Element with id "target" and set it with the sanitized string.
+            outputElm.setHTML(badInputElm.value, { sanitizer: sanitizer1 });
+        });
+</script>
+
+</html>
