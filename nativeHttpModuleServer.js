@@ -3,7 +3,7 @@ const host = 'localhost';
 const port = '8000';
 // We import the promise variant in keeping with modern JavaScript best practices. We use promises as its syntactically more succinct than callbacks, which we would have to use if we assigned fs to just require('fs'). To learn more about asynchronous programming best practices, you can read our How To Write Asynchronous Code in Node.js guide.
 const fs = require('fs').promises;
-// Kommentarer hämtade från tutorial från 
+// Comments retreived from tutorial: 
 // https://www.digitalocean.com/community/tutorials/how-to-create-a-web-server-in-node-js-with-the-http-module
 
 /**

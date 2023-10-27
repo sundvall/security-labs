@@ -35,7 +35,7 @@
     <button id="stop-timer">stop interval</button>
     <script>
         const badInputElm = document.querySelector('#bad-input');
-        const anything = () => { console.log('anything', badInputElm.value, typeof badInputElm.value);  }
+        const anything = () => { console.log(`inputelement type: [${typeof badInputElm.value}] value: ${badInputElm.value}`);  }
         const timeId = setInterval(anything,2000);
         document.querySelector('#stop-timer').addEventListener('click', ()=> clearInterval(timeId)  )
     </script>
