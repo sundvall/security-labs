@@ -7,68 +7,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unsecure raw form</title>
     <style>
-        input {
+        input,
+        label,
+        output,
+        button {
             display: block;
+            margin: 1rem;
+        }
+
+        div,
+        form {
+            padding: 1rem;
+            border: 1px dashed grey;
         }
     </style>
 </head>
 
 <body>
     <h1>Laboration with unfiltered input</h1>
+    <p>Intentionally unsecure html.</p>
+    <p>Do <strong>not</strong> copy these forms into any production code.</p>
+    <!-- This post from MDN is used to create output -->
     <!-- https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Safely_inserting_external_content_into_a_page -->
     <p>Copy and insert for example: </p>
     <ul>
+        <!-- Special characters are transformed into htmlentititesto write this introductory text: -->
         <!-- htmlentitites https://www.freeformatter.com/html-entities.html -->
         <li><code>&lt;img&#32;src&#61;&#39;x&#39;&#32;onerror&#61;&#39;alert&#40;1&#41;&#39;&gt;</code></li>
         <li><code>&lt;script&gt;alert&#40;1&#41;&gt;&lt;&#47;script&gt;</code></li>
     </ul>
+    <!-- This form will post its content to the local server listening to "localhost:3333/bar" -->
+
     <form method="post" action="/bar">
         <label>
             into here:
             <input id="bad-input" name="foo-input" type="text" />
         </label>
-        <label>add as innerHTML<input type="submit" id="innerhtml" type="button"></label>
-        <label>add as textContent<input type="submit" id="textcontent" type="button"></label>
-        <label>add as setHtml<input type="submit" id="sethtml" type="button"></label>
+
+        <div>
+            <h3>output element:</h3>
+            <output id="the-output"></output>
+        </div>
+
+        <h2>Add form value to output element:</h2>
+        <label>outputElement.innerHTML=value<input type="submit" id="innerhtml" value="innerHTML" type="button"></label>
+        <label>outputElement.textContent=value<input type="submit" id="textcontent" value="textContent"
+                type="button"></label>
+        <label>outputElm.setHTML(value, { sanitizer: '' });<input type="submit" id="sethtml" value="setHtml"
+                type="button"></label>
+        <i>Form is not submitted to server</i>
+
+        <h2>Submit the form to the server</h2>
+        <label><input type="submit" value="Default post submit"></label>
+        <i>Inspect content in bash, cmd or similar</i>
+
+        <h2>evil eval</h2>
+        <button id="evil-eval">Evaluate form as script</button>
+
+        <h2>SetInterval:</h2>
+        <p>This script continously executes the form with setInterval.</p>
+        <button id="stop-timer">Stop script</button>
+        <i>SetInterval treats the string as code. </i>
     </form>
-    <p>result Bad (?):<output id="the-output"></output></p>
-    <button id="stop-timer">stop interval</button>
+
+
+
+
+    <h3>Send queryvalue to server</h3>
+    <a href="/foo?msg=hello">Print 'msg=hello' to cmd.</a>
+    <i>See bash or commandline context</i>
+
+
+
+
     <script>
+        // Print the value as innerHTML to the output element
+        document.querySelector('#innerhtml').addEventListener(
+            'click', event => {
+                event.preventDefault();
+                const badInputElm = document.querySelector('#bad-input');
+                const outputElm = document.querySelector('#the-output');
+                console.log('insert into element badInput:', badInputElm.value);
+                outputElm.innerHTML = badInputElm.value;
+            });
+        // Print the value as innerHTML to the output element
+        document.querySelector('#textcontent').addEventListener(
+            'click', event => {
+                event.preventDefault();
+                const badInputElm = document.querySelector('#bad-input');
+                const outputElm = document.querySelector('#the-output');
+                console.log('insert into element textcontent:', badInputElm.value);
+                outputElm.textContent = badInputElm.value;
+            });
+        // Print the value as setHTML to the output element requires sanitizer
+        document.querySelector('#sethtml').addEventListener(
+            'click', event => {
+                event.preventDefault();
+                const badInputElm = document.querySelector('#bad-input');
+                const outputElm = document.querySelector('#the-output');
+                console.log('insert into element sethtml:', badInputElm.value);
+                const defaultSanitizer = new Sanitizer();  // Default sanitizer;
+                outputElm.setHTML(badInputElm.value, { sanitizer: defaultSanitizer });
+            });
+
+        // Evalute the form with setInterval:
         const badInputElm = document.querySelector('#bad-input');
-        const anything = () => { console.log(`inputelement type: [${typeof badInputElm.value}] value: ${badInputElm.value}`);  }
-        const timeId = setInterval(anything,2000);
-        document.querySelector('#stop-timer').addEventListener('click', ()=> clearInterval(timeId)  )
+        const timeId = setInterval(badInputElm.value, 500);
+        document.querySelector('#stop-timer').addEventListener('click', () => clearInterval(timeId))
+
+        // Evaluate the form with "eval":
+        document.querySelector('#evil-eval').addEventListener(
+            'click', event => {
+                event.preventDefault();
+                const badInputElm = document.querySelector('#bad-input');
+                eval(badInputElm.value);
+            });
+
     </script>
 
 </body>
-<script>
-    document.querySelector('#innerhtml').addEventListener(
-        'click', event => {
-            event.preventDefault();
-            const badInputElm = document.querySelector('#bad-input');
-            const outputElm = document.querySelector('#the-output');
-            console.log('insert into element badInput:', badInputElm.value);
-            outputElm.innerHTML = badInputElm.value;
-        });
-    document.querySelector('#textcontent').addEventListener(
-        'click', event => {
-            event.preventDefault();
-            const badInputElm = document.querySelector('#bad-input');
-            const outputElm = document.querySelector('#the-output');
-            console.log('insert into element textcontent:', badInputElm.value);
-            outputElm.textContent = badInputElm.value;
-        });
-    document.querySelector('#sethtml').addEventListener(
-        'click', event => {
-            event.preventDefault();
-            const badInputElm = document.querySelector('#bad-input');
-            const outputElm = document.querySelector('#the-output');
-            console.log('insert into element sethtml:', badInputElm.value);
-            outputElm.textContent = badInputElm.value;
-            const sanitizer1 = new Sanitizer();  // Default sanitizer;
-            // Get the Element with id "target" and set it with the sanitized string.
-            outputElm.setHTML(badInputElm.value, { sanitizer: sanitizer1 });
-        });
-</script>
 
 </html>
