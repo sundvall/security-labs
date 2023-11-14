@@ -35,6 +35,8 @@
         <!-- htmlentitites https://www.freeformatter.com/html-entities.html -->
         <li><code>&lt;img&#32;src&#61;&#39;x&#39;&#32;onerror&#61;&#39;alert&#40;1&#41;&#39;&gt;</code></li>
         <li><code>&lt;script&gt;alert&#40;1&#41;&gt;&lt;&#47;script&gt;</code></li>
+
+        <li><code>&lt;img src='x' onerror='window.location.href=(document.querySelector("#treasure").value)'&gt;</code></li>
     </ul>
     <!-- This form will post its content to the local server listening to "localhost:3333/bar" -->
 
@@ -70,7 +72,9 @@
         <i>SetInterval treats the string as code. </i>
     </form>
 
-
+    <form>
+        <input id="treasure" value="1000" type="hidden"/>
+    </form>
 
 
     <h3>Send queryvalue to server</h3>
