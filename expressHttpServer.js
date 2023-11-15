@@ -19,6 +19,7 @@ app.listen(port, () => {
 // GET /foo?msg=hello ---> {msg: 'hello'}
 app.get('/foo', function (req, res) {
   console.log('get request:query:', req.query);
+  res.sendFile(`${__dirname}/public/foo.txt`);
 });
 
 // POST msg=hello ---> {msg: 'hello'}
